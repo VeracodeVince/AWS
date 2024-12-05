@@ -1,4 +1,4 @@
-#AWS Pipeline stuff##
+#Build stuff##
 version: 0.2
 
 phases:
