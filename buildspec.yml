@@ -18,5 +18,7 @@ phases:
 
 artifacts:
   files:
-    - app/target/*.jar # Adjust if your output is not a JAR file
+    - app/target/*.war # Look for the .war file
+
+
 
