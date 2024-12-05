@@ -15,5 +15,13 @@ phases:
     commands:
       - echo "Building project..."
       - mvn -B package # Building the project
+      - echo "Running Veracode static analysis..."
+      # Run Veracode scan using API wrapper
+      - java -jar /opt/veracode/api-wrapper.jar -action uploadandscan -vid $VID -vkey $VKEY -appname veracodevince_aws -createprofile true -version $(date +%Y-%m-%d-%H:%M) -filepath target/your-application.war -sandboxname your-sandbox -createsandbox false
+
+artifacts:
+  files:
+    - target/*.war
+  name: build-output
 
  
