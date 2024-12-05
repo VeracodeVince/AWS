@@ -6,31 +6,35 @@ phases:
       java: corretto11
     commands:
       - echo "Installing dependencies..."
-      - cd app # Change directory to app
-      - mvn install -DskipTests
+      - cd app # Navigate to app directory
+      - mvn install -DskipTests # Install dependencies without running tests
 
   build:
     commands:
       - echo "Building the project..."
-      - mvn -B package # Build the project and generate artifacts
+      - mvn -B package # Compile and build the project to generate the .war artifact
 
   post_build:
     commands:
       - echo "Build completed successfully!"
-      - echo "Downloading Veracode Pipeline Scanner..."
-      - docker pull veracode/api-wrapper-java
+      - echo "Pulling Veracode API Wrapper Docker Image..."
+      - docker pull veracode/api-wrapper-java:latest # Pull the Docker image
       - echo "Running Veracode Static Analysis..."
       - docker run --rm \
           -e VERACODE_API_ID=$VERACODE_API_ID \
           -e VERACODE_API_KEY=$VERACODE_API_KEY \
           -v $(pwd):/data \
-          veracode/api-wrapper-java \
+          veracode/api-wrapper-java:latest \
           -action uploadandscan \
-          -vid $VERACODE_API_ID \
-          -vkey $VERACODE_API_KEY \
           -file /data/app/target/verademo.war
-      - echo "Veracode Static Analysis completed successfully!"
+      - echo "Veracode upload and scan completed successfully!"
 
 artifacts:
   files:
-    - app/target/*.war # Include the built artifact
+    - app/target/*.war # Ensure the .war file is included as an artifact
+
+env:
+  variables:
+    # Optional: Specify the Veracode credentials here or provide them in the CodeBuild project environment variables
+    # VERACODE_API_ID: "your-api-id"
+    # VERACODE_API_KEY: "your-api-key"
