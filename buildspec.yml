@@ -32,9 +32,3 @@ phases:
 artifacts:
   files:
     - app/target/*.war # Ensure the .war file is included as an artifact
-
-env:
-  variables:
-    # Optional: Specify the Veracode credentials here or provide them in the CodeBuild project environment variables
-    # VERACODE_API_ID: "your-api-id"
-    # VERACODE_API_KEY: "your-api-key"
