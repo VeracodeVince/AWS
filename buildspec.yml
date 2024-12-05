@@ -4,22 +4,30 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      java: corretto11
+      java: corretto11 # Ensure the correct Java version for the Veracode scanner
     commands:
-      - echo "Installing dependencies..."
-      - cd app # Change directory to app
-      - mvn install -DskipTests
+      - echo "Installing Veracode Pipeline Scanner..."
+      - curl -O https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+      - unzip -o pipeline-scan-LATEST.zip -d pipeline-scan
+
   build:
     commands:
       - echo "Building project..."
       - mvn -B package
+
   post_build:
     commands:
-      - echo "Build completed successfully!"
+      - echo "Running Veracode Pipeline Scan..."
+      - java -jar pipeline-scan/pipeline-scan.jar \
+          --veracode_api_id=$VERACODE_API_ID \
+          --veracode_api_key=$VERACODE_API_KEY \
+          --file app/target/verademo.war # Adjust this path to your artifact
+      - echo "Veracode scan completed."
 
 artifacts:
   files:
-    - app/target/*.war # Look for the .war file
+    - app/target/*.war # Ensure this matches your build output
+
 
 
 
