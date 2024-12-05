@@ -3,9 +3,10 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      java: corretto11 # Use the Java version required by the project
+      java: corretto11
     commands:
       - echo "Installing dependencies..."
+      - cd app # Change directory to app
       - mvn install -DskipTests
   build:
     commands:
@@ -17,4 +18,5 @@ phases:
 
 artifacts:
   files:
-    - target/*.jar # Adjust if your build outputs a WAR or another file type
+    - app/target/*.jar # Adjust if your output is not a JAR file
+
