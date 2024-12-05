@@ -3,11 +3,11 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      java: corretto11 # Ensure the correct Java runtime is used
+      java: corretto11
     commands:
       - echo "Installing dependencies..."
-      - cd app # Navigate to the application folder
-      - mvn install -DskipTests # Install dependencies
+      - cd app # Change directory to app
+      - mvn install -DskipTests
 
   build:
     commands:
@@ -17,10 +17,9 @@ phases:
   post_build:
     commands:
       - echo "Build completed successfully!"
-      - echo "Preparing for Veracode Static Analysis..."
-      - echo "Pulling Veracode API Wrapper Docker Image..."
+      - echo "Downloading Veracode Pipeline Scanner..."
       - docker pull veracode/api-wrapper-java
-      - echo "Starting Veracode Static Analysis..."
+      - echo "Running Veracode Static Analysis..."
       - docker run --rm \
           -e VERACODE_API_ID=$VERACODE_API_ID \
           -e VERACODE_API_KEY=$VERACODE_API_KEY \
