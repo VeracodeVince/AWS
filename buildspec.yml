@@ -1,0 +1,20 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      java: corretto11 # Use the Java version required by the project
+    commands:
+      - echo "Installing dependencies..."
+      - mvn install -DskipTests
+  build:
+    commands:
+      - echo "Building project..."
+      - mvn -B package
+  post_build:
+    commands:
+      - echo "Build completed successfully!"
+
+artifacts:
+  files:
+    - target/*.jar # Adjust if your build outputs a WAR or another file type
