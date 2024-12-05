@@ -6,19 +6,23 @@ phases:
       java: corretto11
     commands:
       - echo "Installing dependencies..."
-      - cd app # Navigate to app directory
+      - cd app
       - mvn install -DskipTests # Install dependencies without running tests
 
   build:
     commands:
       - echo "Building the project..."
-      - mvn -B package # Compile and build the project to generate the .war artifact
+      - mvn -B package # Build the project to generate the .war file
 
   post_build:
     commands:
       - echo "Build completed successfully!"
-      - echo "Pulling Veracode API Wrapper Docker Image..."
-      - docker pull veracode/api-wrapper-java:latest # Pull the Docker image
+      - echo "Downloading Veracode API Wrapper Docker Image..."
+      - docker pull veracode/api-wrapper-java:latest # Pull the Veracode API Wrapper Docker image
+      - echo "Fetching Veracode API credentials from Secrets Manager..."
+      - |
+        export VERACODE_API_ID=$(aws secretsmanager get-secret-value --secret-id VERACODE_API_ID_SECRET --query SecretString --output text | jq -r .VERACODE_API_ID)
+        export VERACODE_API_KEY=$(aws secretsmanager get-secret-value --secret-id VERACODE_API_KEY_SECRET --query SecretString --output text | jq -r .VERACODE_API_KEY)
       - echo "Running Veracode Static Analysis..."
       - docker run --rm \
           -e VERACODE_API_ID=$VERACODE_API_ID \
@@ -26,9 +30,19 @@ phases:
           -v $(pwd):/data \
           veracode/api-wrapper-java:latest \
           -action uploadandscan \
-          -file /data/app/target/verademo.war
-      - echo "Veracode upload and scan completed successfully!"
+          -vid $VERACODE_API_ID \
+          -vkey $VERACODE_API_KEY \
+          -appname verademo-java \
+          -createprofile false \
+          -version $(date +%Y-%m-%d-%H:%M) \
+          -filepath /data/app/target/verademo.war \
+          -sandboxname aws-codebuild \
+          -createsandbox true
+      - echo "Veracode scan completed successfully!"
 
 artifacts:
   files:
-    - app/target/*.war # Ensure the .war file is included as an artifact
+    - app/target/*.war # Include the generated .war file as an artifact
+
+environment_variables:
+  plaintext: {}
