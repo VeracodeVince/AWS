@@ -3,35 +3,35 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      java: corretto11
+      java: corretto11 # Ensure the correct Java runtime is used
     commands:
       - echo "Installing dependencies..."
-      - cd app # Change directory to app
-      - mvn install -DskipTests
+      - cd app # Navigate to the application folder
+      - mvn install -DskipTests # Install dependencies
 
   build:
     commands:
-      - echo "Building project..."
-      - mvn -B package
+      - echo "Building the project..."
+      - mvn -B package # Build the project and generate artifacts
 
   post_build:
     commands:
       - echo "Build completed successfully!"
-      - echo "Listing contents of app/target:"
-      - ls -al app/target
-      - echo "Setting permissions for .war file..."
-      - chmod 644 app/target/verademo.war
-      - echo "Downloading Veracode Pipeline Scanner..."
-      - curl -O https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
-      - unzip -o pipeline-scan-LATEST.zip -d pipeline-scan
-      - echo "Running Veracode Pipeline Scan..."
-      - |
-        java -jar pipeline-scan/pipeline-scan.jar \
+      - echo "Preparing for Veracode Static Analysis..."
+      - echo "Pulling Veracode API Wrapper Docker Image..."
+      - docker pull veracode/api-wrapper-java
+      - echo "Starting Veracode Static Analysis..."
+      - docker run --rm \
+          -e VERACODE_API_ID=$VERACODE_API_ID \
+          -e VERACODE_API_KEY=$VERACODE_API_KEY \
+          -v $(pwd):/data \
+          veracode/api-wrapper-java \
+          -action uploadandscan \
           -vid $VERACODE_API_ID \
           -vkey $VERACODE_API_KEY \
-          -f app/target/verademo.war
-      - echo "Veracode scan completed successfully!"
+          -file /data/app/target/verademo.war
+      - echo "Veracode Static Analysis completed successfully!"
 
 artifacts:
   files:
-    - app/target/*.war # Look for the .war file
+    - app/target/*.war # Include the built artifact
