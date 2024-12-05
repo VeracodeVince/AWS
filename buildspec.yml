@@ -22,11 +22,12 @@ phases:
       - unzip -o pipeline-scan-LATEST.zip -d pipeline-scan
       - echo "Running Veracode Pipeline Scan..."
       - java -jar pipeline-scan/pipeline-scan.jar \
-          --vid $VERACODE_API_ID \
-          --vkey $VERACODE_API_KEY \
-          --file app/target/verademo.war
+          -vid $VERACODE_API_ID \
+          -vkey $VERACODE_API_KEY \
+          -f app/target/verademo.war
       - echo "Veracode scan completed successfully!"
 
 artifacts:
   files:
     - app/target/*.war # Look for the .war file
+
