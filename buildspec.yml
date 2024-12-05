@@ -20,7 +20,15 @@ phases:
       - echo "Downloading Veracode Pipeline Scanner..."
       - docker pull veracode/api-wrapper-java
       - echo "Running Veracode Static Analysis..."
-      - docker run --rm -e VERACODE_API_ID=$VERACODE_API_ID -e VERACODE_API_KEY=$VERACODE_API_KEY -v $(pwd):/data veracode/api-wrapper-java -action uploadandscan -vid $VERACODE_API_ID -vkey $VERACODE_API_KEY -file /data/app/target/verademo.war
+      - docker run --rm \
+          -e VERACODE_API_ID=$VERACODE_API_ID \
+          -e VERACODE_API_KEY=$VERACODE_API_KEY \
+          -v $(pwd):/data \
+          veracode/api-wrapper-java \
+          -action uploadandscan \
+          -vid $VERACODE_API_ID \
+          -vkey $VERACODE_API_KEY \
+          -file /data/app/target/verademo.war
       - echo "Veracode Static Analysis completed successfully!"
 
 artifacts:
