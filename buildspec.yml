@@ -1,4 +1,3 @@
-#AWS Codestart config file#
 version: 0.2
 
 phases:
@@ -15,21 +14,20 @@ phases:
       - echo "Building project..."
       - mvn -B package
 
- post_build:
-  commands:
-    - echo "Build completed successfully!"
-    - echo "Downloading Veracode Pipeline Scanner..."
-    - curl -O https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
-    - unzip -o pipeline-scan-LATEST.zip -d pipeline-scan
-    - echo "Running Veracode Pipeline Scan..."
-    - |
-      java -jar pipeline-scan/pipeline-scan.jar \
-        -vid $VERACODE_API_ID \
-        -vkey $VERACODE_API_KEY \
-        -f app/target/verademo.war
-    - echo "Veracode scan completed successfully!"
+  post_build:
+    commands:
+      - echo "Build completed successfully!"
+      - echo "Downloading Veracode Pipeline Scanner..."
+      - curl -O https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+      - unzip -o pipeline-scan-LATEST.zip -d pipeline-scan
+      - echo "Running Veracode Pipeline Scan..."
+      - |
+        java -jar pipeline-scan/pipeline-scan.jar \
+          -vid $VERACODE_API_ID \
+          -vkey $VERACODE_API_KEY \
+          -f app/target/verademo.war
+      - echo "Veracode scan completed successfully!"
 
 artifacts:
   files:
     - app/target/*.war # Look for the .war file
-
