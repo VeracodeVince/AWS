@@ -5,33 +5,24 @@ phases:
     runtime-versions:
       java: corretto11
     commands:
-      # Install jq (JSON parsing tool) for secrets management
-      - echo "Installing jq..."
-      - yum install -y jq
-      # Install project dependencies
       - echo "Installing dependencies..."
-      - cd app
-      - mvn install -DskipTests
+      - cd app # Change directory to app
+      - mvn install -DskipTests # Installing dependencies without tests
 
   build:
     commands:
-      - echo "Building the project..."
-      - mvn -B package
+      - echo "Building project..."
+      - mvn -B package # Building the project
 
   post_build:
     commands:
       - echo "Build completed successfully!"
       - echo "Downloading Veracode API Wrapper Docker Image..."
-      # Pull the Veracode API wrapper Docker image
-      - docker pull veracode/api-wrapper-java:latest
+      - docker pull veracode/api-wrapper-java:latest # Pulling the Veracode API wrapper Docker image
       - echo "Fetching Veracode API credentials from Secrets Manager..."
-      # Retrieve Veracode API keys from AWS Secrets Manager
       - export VERACODE_API_ID=$(aws secretsmanager get-secret-value --secret-id VERACODE_API_ID_SECRET --query SecretString --output text | jq -r .VERACODE_API_ID)
       - export VERACODE_API_KEY=$(aws secretsmanager get-secret-value --secret-id VERACODE_API_KEY_SECRET --query SecretString --output text | jq -r .VERACODE_API_KEY)
-      # Check that we retrieved the keys correctly
-      - echo "Veracode API credentials fetched successfully"
       - echo "Running Veracode Static Analysis..."
-      # Run Veracode Static Analysis using the wrapper tool
       - docker run --rm \
           -e VERACODE_API_ID=$VERACODE_API_ID \
           -e VERACODE_API_KEY=$VERACODE_API_KEY \
@@ -41,13 +32,12 @@ phases:
           -vid $VERACODE_API_ID \
           -vkey $VERACODE_API_KEY \
           -appname verademo-java \
-          -createprofile false \
+          -createprofile true \
           -version $(date +%Y-%m-%d-%H:%M) \
           -filepath /data/app/target/verademo.war \
           -sandboxname aws-codebuild \
-          -createsandbox true
-      - echo "Veracode scan completed successfully!"
+          -createsandbox false
 
 artifacts:
   files:
-    - app/target/*.war
+    - app/target/*.war # Ensure that the WAR file is available for the scan
