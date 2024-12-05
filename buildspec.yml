@@ -5,25 +5,33 @@ phases:
     runtime-versions:
       java: corretto11
     commands:
+      # Install jq (JSON parsing tool) for secrets management
+      - echo "Installing jq..."
+      - yum install -y jq
+      # Install project dependencies
       - echo "Installing dependencies..."
       - cd app
-      - mvn install -DskipTests # Install dependencies without running tests
+      - mvn install -DskipTests
 
   build:
     commands:
       - echo "Building the project..."
-      - mvn -B package # Build the project to generate the .war file
+      - mvn -B package
 
   post_build:
     commands:
       - echo "Build completed successfully!"
       - echo "Downloading Veracode API Wrapper Docker Image..."
-      - docker pull veracode/api-wrapper-java:latest # Pull the Veracode API Wrapper Docker image
+      # Pull the Veracode API wrapper Docker image
+      - docker pull veracode/api-wrapper-java:latest
       - echo "Fetching Veracode API credentials from Secrets Manager..."
-      - |
-        export VERACODE_API_ID=$(aws secretsmanager get-secret-value --secret-id VERACODE_API_ID_SECRET --query SecretString --output text | jq -r .VERACODE_API_ID)
-        export VERACODE_API_KEY=$(aws secretsmanager get-secret-value --secret-id VERACODE_API_KEY_SECRET --query SecretString --output text | jq -r .VERACODE_API_KEY)
+      # Retrieve Veracode API keys from AWS Secrets Manager
+      - export VERACODE_API_ID=$(aws secretsmanager get-secret-value --secret-id VERACODE_API_ID_SECRET --query SecretString --output text | jq -r .VERACODE_API_ID)
+      - export VERACODE_API_KEY=$(aws secretsmanager get-secret-value --secret-id VERACODE_API_KEY_SECRET --query SecretString --output text | jq -r .VERACODE_API_KEY)
+      # Check that we retrieved the keys correctly
+      - echo "Veracode API credentials fetched successfully"
       - echo "Running Veracode Static Analysis..."
+      # Run Veracode Static Analysis using the wrapper tool
       - docker run --rm \
           -e VERACODE_API_ID=$VERACODE_API_ID \
           -e VERACODE_API_KEY=$VERACODE_API_KEY \
@@ -42,7 +50,4 @@ phases:
 
 artifacts:
   files:
-    - app/target/*.war # Include the generated .war file as an artifact
-
-environment_variables:
-  plaintext: {}
+    - app/target/*.war
