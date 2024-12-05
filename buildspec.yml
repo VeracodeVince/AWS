@@ -8,6 +8,8 @@ phases:
       - echo "Installing dependencies..."
       - cd app # Change directory to app
       - mvn install -DskipTests # Installing dependencies without tests
+      - echo "Installing jq..."
+      - yum install -y jq  # Installing jq to parse JSON responses
 
   build:
     commands:
