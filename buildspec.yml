@@ -17,11 +17,13 @@ phases:
   post_build:
     commands:
       - echo "Build completed successfully!"
+      - echo "Listing contents of app/target:"
+      - ls -al app/target
+      - echo "Setting permissions for .war file..."
+      - chmod 644 app/target/verademo.war
       - echo "Downloading Veracode Pipeline Scanner..."
       - curl -O https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
       - unzip -o pipeline-scan-LATEST.zip -d pipeline-scan
-      - echo "Setting permissions for .war file..."
-      - chmod 644 app/target/verademo.war
       - echo "Running Veracode Pipeline Scan..."
       - |
         java -jar pipeline-scan/pipeline-scan.jar \
