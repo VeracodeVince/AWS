@@ -1,3 +1,4 @@
+
 version: 0.2
 
 phases:
@@ -10,14 +11,8 @@ phases:
       - mvn install -DskipTests # Installing dependencies without tests
       - echo "Installing jq..."
       - apt-get update && apt-get install -y jq  # Install jq using apt-get
-      - echo "Downloading Veracode API wrapper..."
-      - aws s3 cp s3://veracode-api-wrapper-bucket/vosp-api-wrappers-java-24.10.15.0-dist.zip /opt/veracode/api-wrapper.zip  # Correct file path
-      - echo "Listing files in /opt/veracode/ before extraction"
-      - ls -l /opt/veracode/  # List files before extraction
-      - echo "Extracting Veracode API wrapper..."
-      - unzip /opt/veracode/api-wrapper.zip -d /opt/veracode/  # Unzipping the API wrapper
-      - echo "Listing files in /opt/veracode/ after extraction"
-      - ls -l /opt/veracode/  # List files after extraction
+      - echo "Downloading Veracode API wrapper JAR from S3..."
+      - aws s3 cp https://veracode-api-wrapper-bucket.s3.us-east-2.amazonaws.com/VeracodeJavaAPI.jar /opt/veracode/api-wrapper.jar  # Corrected URL from your S3
 
   build:
     commands:
@@ -30,7 +25,7 @@ phases:
       - export VID=$(aws secretsmanager get-secret-value --secret-id veracode_keys --query 'SecretString' --output text | jq -r '.VID')
       - export VKEY=$(aws secretsmanager get-secret-value --secret-id veracode_keys --query 'SecretString' --output text | jq -r '.VKEY')
       - echo "Running Veracode static analysis..."
-      - java -jar /opt/veracode/VeracodeAPIWrapper-2.0.0.jar -action uploadandscan -vid $VID -vkey $VKEY -appname veracodevince_aws -createprofile true -version $(date +%Y-%m-%d-%H:%M) -filepath target/*.war -sandboxname your-sandbox -createsandbox false  # Make sure to use the correct jar file
+      - java -jar /opt/veracode/api-wrapper.jar -action uploadandscan -vid $VID -vkey $VKEY -appname veracodevince_aws -createprofile true -version $(date +%Y-%m-%d-%H:%M) -filepath target/*.war -sandboxname your-sandbox -createsandbox false  # Use the JAR for analysis
 
 artifacts:
   files:
