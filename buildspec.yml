@@ -9,10 +9,7 @@ phases:
       - cd app # Change directory to app
       - mvn install -DskipTests # Installing dependencies without tests
       - echo "Installing jq..."
-      - yum install -y jq  # Installing jq to parse JSON responses
-      - echo "Downloading Veracode API wrapper..."
-      - curl -O https://download.veracode.com/securityscan/api-wrapper/VeracodeAPIWrapper-2.0.0.jar # Example URL for Veracode API wrapper download
-      - mv VeracodeAPIWrapper-2.0.0.jar /opt/veracode/api-wrapper.jar # Move the downloaded JAR to the required location
+      - apt-get update && apt-get install -y jq  # Install jq using apt-get
 
   build:
     commands:
@@ -31,4 +28,3 @@ artifacts:
   files:
     - target/*.war
   name: build-output
-
