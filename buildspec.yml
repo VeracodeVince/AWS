@@ -11,7 +11,7 @@ phases:
       - echo "Installing jq..."
       - apt-get update && apt-get install -y jq  # Install jq using apt-get
       - echo "Downloading Veracode API wrapper JAR from S3..."
-      - aws s3 cp https://veracode-api-wrapper-bucket.s3.us-east-2.amazonaws.com/VeracodeJavaAPI.jar /opt/veracode/api-wrapper.jar  # Fetch Veracode wrapper from S3
+      - aws s3 cp s3://veracode-api-wrapper-bucket/VeracodeJavaAPI.jar /opt/veracode/api-wrapper.jar  # Fetch Veracode wrapper from S3
 
   build:
     commands:
@@ -30,6 +30,7 @@ artifacts:
   files:
     - target/*.war
   name: build-output
+
 
 
 
