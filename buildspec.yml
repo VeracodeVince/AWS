@@ -1,4 +1,4 @@
-version: 0.2
+version: 0.2 ####
 
 phases:
   install:
@@ -12,9 +12,6 @@ phases:
       - apt-get update && apt-get install -y jq  # Install jq using apt-get
       - echo "Downloading Veracode API wrapper JAR from S3..."
       - aws s3 cp s3://veracode-api-wrapper-bucket/VeracodeJavaAPI.jar /opt/veracode/api-wrapper.jar  # Fetch Veracode wrapper from S3
-      - echo "Verifying file download..."
-      - aws s3 ls s3://veracode-api-wrapper-bucket/VeracodeJavaAPI.jar # This will check if the file exists in the bucket
-      - ls -l /opt/veracode/   # Check if the API wrapper was downloaded successfully
 
   build:
     commands:
@@ -24,21 +21,12 @@ phases:
   post_build:
     commands:
       - echo "Retrieving Veracode API keys from Secrets Manager..."
-      - export VID=$(aws secretsmanager get-secret-value --secret-id veracode_keys --query 'SecretString' --output text | jq -r '.VID')
-      - export VKEY=$(aws secretsmanager get-secret-value --secret-id veracode_keys --query 'SecretString' --output text | jq -r '.VKEY')
+      - export VID=$(aws secretsmanager get-secret-value --secret-id veracode --query 'SecretString' --output text | jq -r '.VID')
+      - export VKEY=$(aws secretsmanager get-secret-value --secret-id veracode --query 'SecretString' --output text | jq -r '.VKEY')
       - echo "Running Veracode static analysis..."
-      - java -jar /opt/veracode/api-wrapper.jar -action uploadandscan -vid $VID -vkey $VKEY -appname veracodevince_aws -createprofile true -version $(date +%Y-%m-%d-%H:%M) -filepath target/*.war -createsandbox false || echo "Error executing Veracode scan"
+      - java -jar /opt/veracode/api-wrapper.jar -action uploadandscan -vid $VID -vkey $VKEY -appname veracodevince_aws -createprofile true -version $(date +%Y-%m-%d-%H:%M) -filepath target/*.war -createsandbox false
 
 artifacts:
   files:
     - target/*.war
   name: build-output
-
-
-
-
-
-
-
-
-
