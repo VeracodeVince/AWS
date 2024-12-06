@@ -10,6 +10,9 @@ phases:
       - mvn install -DskipTests # Installing dependencies without tests
       - echo "Installing jq..."
       - apt-get update && apt-get install -y jq  # Install jq using apt-get
+      - echo "Downloading Veracode API wrapper..."
+      - curl -O https://download.veracode.com/securityscan/api-wrapper/VeracodeAPIWrapper-2.0.0.jar  # URL might differ, check Veracode documentation
+      - mv VeracodeAPIWrapper-2.0.0.jar /opt/veracode/api-wrapper.jar # Move the downloaded JAR to the required location
 
   build:
     commands:
