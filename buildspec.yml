@@ -35,8 +35,3 @@ artifacts:
   files:
     - target/*.war
   name: build-output
-
-
-
-
-
