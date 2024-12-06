@@ -11,10 +11,10 @@ phases:
       - echo "Installing jq..."
       - apt-get update && apt-get install -y jq  # Install jq using apt-get
       - echo "Downloading Veracode API wrapper..."
-      - aws s3 cp s3://veracode-api-wrapper-bucket/vosp-api-wrappers-java-24.10.15.0-dist.zip /opt/veracode/api-wrapper.zip  # Corrected file path
+      - aws s3 cp s3://veracode-api-wrapper-bucket/vosp-api-wrappers-java-24.10.15.0-dist.zip /opt/veracode/api-wrapper.zip  # Correct file path
       - echo "Extracting Veracode API wrapper..."
       - unzip /opt/veracode/api-wrapper.zip -d /opt/veracode/  # Unzipping the API wrapper
-      - echo "Listing files in /opt/veracode/"
+      - echo "Listing files in /opt/veracode/ to check if the .jar exists"
       - ls -l /opt/veracode/  # List files to check if the .jar file exists
 
   build:
@@ -34,10 +34,6 @@ artifacts:
   files:
     - target/*.war
   name: build-output
-
-
-
-
 
 
 
