@@ -14,6 +14,8 @@ phases:
       - aws s3 cp s3://veracode-api-wrapper-bucket/vosp-api-wrappers-java-24.10.15.0-dist.zip /opt/veracode/api-wrapper.zip  # Corrected file path
       - echo "Extracting Veracode API wrapper..."
       - unzip /opt/veracode/api-wrapper.zip -d /opt/veracode/  # Unzipping the API wrapper
+      - echo "Listing files in /opt/veracode/"
+      - ls -l /opt/veracode/  # List files to check if the .jar file exists
 
   build:
     commands:
@@ -32,6 +34,7 @@ artifacts:
   files:
     - target/*.war
   name: build-output
+
 
 
 
