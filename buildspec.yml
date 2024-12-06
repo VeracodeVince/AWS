@@ -6,25 +6,29 @@ phases:
       java: corretto11
     commands:
       - echo "Installing dependencies..."
-      - cd app # Change directory to app
-      - mvn install -DskipTests # Installing dependencies without tests
+      - cd app  # Change directory to app
+      - mvn install -DskipTests  # Install dependencies without tests
       - echo "Installing jq..."
       - apt-get update && apt-get install -y jq  # Install jq using apt-get
 
   build:
     commands:
       - echo "Building project..."
-      - mvn -B package # Building the project
+      - mvn -B package  # Build the project
       - echo "Pulling Veracode API wrapper Docker image..."
-      - docker pull veracode/api-wrapper-java  # Pull the Veracode API wrapper Docker image
+      - docker pull veracode/api-wrapper-java  # Pull Veracode API wrapper Docker image
 
   post_build:
     commands:
+      - echo "Retrieving Veracode API keys from Secrets Manager..."
+      - export VID=$(aws secretsmanager get-secret-value --secret-id veracode_keys --query 'SecretString' --output text | jq -r '.VID')
+      - export VKEY=$(aws secretsmanager get-secret-value --secret-id veracode_keys --query 'SecretString' --output text | jq -r '.VKEY')
       - echo "Running Veracode static analysis..."
-      - docker run --rm -e VID=$VID -e VKEY=$VKEY -v $(pwd)/target:/veracode-wrapper -w /veracode-wrapper veracode/api-wrapper-java -action uploadandscan -vid $VID -vkey $VKEY -appname veracodevince_aws -createprofile true -version $(date +%Y-%m-%d-%H:%M) -filepath target/*.war -sandboxname your-sandbox -createsandbox false
+      - docker run --rm -e VID=$VID -e VKEY=$VKEY -v $(pwd)/target:/veracode-wrapper -w /veracode-wrapper veracode/api-wrapper-java bash -c "java -jar /veracode-wrapper/VeracodeAPIWrapper-2.0.0.jar -action uploadandscan -vid $VID -vkey $VKEY -appname veracodevince_aws -createprofile true -version $(date +%Y-%m-%d-%H:%M) -filepath target/*.war -sandboxname your-sandbox -createsandbox false"
 
 artifacts:
   files:
     - target/*.war
   name: build-output
+
 
